@@ -14,6 +14,7 @@
 #include "SDKConfig.h"
 #include "PlatformHandler.h"
 #include "AuthHandler.h"
+#include "AchievementHandler.h"
 
 int main()
 {
@@ -31,4 +32,18 @@ int main()
 	assert(puid != nullptr);
 
 	std::cout << "Logged in and PUID is: " << puid << std::endl;
+
+	//Get achievements handler Achievements
+	AchievementHandler* achievementIniterface = new AchievementHandler();
+	EOS_HAchievements achievementHandle = nullptr;
+
+	achievementHandle = achievementIniterface->GetAchievementHandle(platformHandle);
+	assert(achievementHandle != nullptr);
+	//looong line
+	EOS_Achievements_DefinitionV2* definition = achievementIniterface->GetAchievementDefinitions(achievementHandle, platformHandle, puid);
+	assert(definition != nullptr);
+
+	std::cout << "Achievement is: " << definition->LockedDisplayName << std::endl;
+
+
 }
