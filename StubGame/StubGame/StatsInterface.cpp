@@ -36,6 +36,7 @@ void StatsInterface::IngestStat(EOS_HStats* statsHandle, EOS_HPlatform* platform
 
 	//Ingest and wait for response
 	EOS_Stats_IngestStat(*statsHandle, &ingestOptions, puid, EOS_Stats_OnIngestStatCompleteCallback);
+	bIngestComplete = false;
 	while (!bIngestComplete) {
 		EOS_Platform_Tick(*platformHandle);
 	}
@@ -55,9 +56,9 @@ EOS_Stats_Stat* StatsInterface::GetStats(EOS_HStats* statsHandle, EOS_HPlatform*
 	statsOptions.StartTime = EOS_STATS_TIME_UNDEFINED;
 	statsOptions.EndTime = EOS_STATS_TIME_UNDEFINED;
 
-	
 	//Query player stats and cache them locally
 	EOS_Stats_QueryStats(*statsHandle, &statsOptions, puid, EOS_Stats_OnQueryStatsCompleteCallback);
+	bQueryComplete = false;
 	while (!bQueryComplete) {
 		EOS_Platform_Tick(*platformHandle);
 	}

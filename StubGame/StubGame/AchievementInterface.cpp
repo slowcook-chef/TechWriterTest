@@ -24,7 +24,7 @@ EOS_Achievements_DefinitionV2* AchievementInterface::GetAchievementDefinitions(E
 
 	//Query EOS and wait
 	EOS_Achievements_QueryDefinitions(*achievementHandle, &queryDefinitionOptions, puid, EOS_Achievements_OnQueryDefinitionsCompleteCallback);
-
+	bQueryComplete = false;
 	while (!bQueryComplete) {
 		EOS_Platform_Tick(*platformHandle);
 	}
@@ -50,12 +50,16 @@ EOS_Achievements_DefinitionV2* AchievementInterface::GetAchievementDefinitions(E
 }
 EOS_Achievements_PlayerAchievement* AchievementInterface::GetPlayerAchievements(EOS_HAchievements* achievementHandle, EOS_HPlatform* platformHandle, EOS_ProductUserId* puid) {
 	assert(puid != nullptr);
-	//Query player achievements and cache them locally
+	//Define query player achievement options
 	EOS_Achievements_QueryPlayerAchievementsOptions playerAchievementOptions = {};
 	playerAchievementOptions.ApiVersion = EOS_ACHIEVEMENTS_QUERYPLAYERACHIEVEMENTS_API_LATEST;
 	playerAchievementOptions.TargetUserId = *puid;
 	playerAchievementOptions.LocalUserId = *puid;
+
+	
+	//Query player achievements and cache them locally
 	EOS_Achievements_QueryPlayerAchievements(*achievementHandle, &playerAchievementOptions, puid, EOS_Achievements_OnQueryPlayerAchievementsCompleteCallback);
+	bQueryPlayerAchievementsComplete = false;
 	while (!bQueryPlayerAchievementsComplete) {
 		EOS_Platform_Tick(*platformHandle);
 	}
@@ -100,6 +104,15 @@ void AchievementInterface::ManualUnlockAchievement(EOS_HAchievements* achievemen
 	}
 	
 }
+void AchievementInterface::SetUpNotifications(EOS_HAchievements* achievementHandle, EOS_HPlatform* platformHandle, EOS_ProductUserId* puid) {
+	//Define notification options
+	EOS_Achievements_AddNotifyAchievementsUnlockedV2Options notifyOptions = {};
+	notifyOptions.ApiVersion = EOS_ACHIEVEMENTS_ADDNOTIFYACHIEVEMENTSUNLOCKED_API_LATEST;
+	//Set up notification
+	EOS_Achievements_AddNotifyAchievementsUnlockedV2(*achievementHandle, &notifyOptions, *puid, EOS_Achievements_OnAchievementsUnlockedCallbackV2);
+
+}
+
 //Display achievements functions
 void AchievementInterface::DisplayPlayerAchievements(EOS_Achievements_PlayerAchievement* playerAchievements) {
 	assert(playerAchievements != nullptr);
@@ -161,4 +174,9 @@ void EOS_CALL AchievementInterface::EOS_Achievements_OnQueryPlayerAchievementsCo
 		std::cout << "Player Achievements Query Failed, terminate manually" << std::endl;
 		return;
 	}
+}
+
+void EOS_CALL AchievementInterface::EOS_Achievements_OnAchievementsUnlockedCallbackV2(const EOS_Achievements_OnAchievementsUnlockedCallbackV2Info* Data) {
+	assert(Data != NULL);
+	std::cout << "NOTIFICATIONS: Achievement Unlocked: " << Data->AchievementId << std::endl;
 }
