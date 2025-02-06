@@ -24,7 +24,7 @@
     <ClCompile Include="PlatformHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AchievementHandler.cpp">
+    <ClCompile Include="AchievementInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,7 +38,7 @@
     <ClInclude Include="AuthHandler.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="AchievementHandler.h">
+    <ClInclude Include="AchievementInterface.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

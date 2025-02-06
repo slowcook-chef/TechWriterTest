@@ -402,4 +402,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+#large or sensitive files
+StubGame/StubGame/SDKConfig.h"
 StubGame/StubGame/sdk/Tools/

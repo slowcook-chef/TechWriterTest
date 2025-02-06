@@ -14,36 +14,74 @@
 #include "SDKConfig.h"
 #include "PlatformHandler.h"
 #include "AuthHandler.h"
-#include "AchievementHandler.h"
+#include "AchievementInterface.h"
 
 int main()
 {
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	// Run the above line to look for memory leaks ^
+	
 	// Initialize config and platform
 	SDKConfig* config = new SDKConfig;
 	PlatformHandler* platformInitializer = new PlatformHandler();
-	EOS_HPlatform platformHandle = nullptr;
-	platformHandle = platformInitializer->InitializePlatform(config);
+	EOS_HPlatform* platformHandle = new EOS_HPlatform();
+	*platformHandle = platformInitializer->InitializePlatform(config);
 	assert(platformHandle != nullptr);
 
 	// Login and retrieve a PUID
 	AuthHandler* auth = new AuthHandler();
-	EOS_ProductUserId puid = nullptr;
-	puid = auth->Login(config, platformHandle);
+	EOS_ProductUserId* puid = new EOS_ProductUserId();
+	*puid = auth->Login(config, *platformHandle);
 	assert(puid != nullptr);
-
 	std::cout << "Logged in and PUID is: " << puid << std::endl;
 
-	//Get achievements handler Achievements
-	AchievementHandler* achievementIniterface = new AchievementHandler();
-	EOS_HAchievements achievementHandle = nullptr;
-
-	achievementHandle = achievementIniterface->GetAchievementHandle(platformHandle);
+	//Initialize the achievement interface and handle
+	AchievementInterface* achievementIniterface = new AchievementInterface();
+	EOS_HAchievements* achievementHandle = new EOS_HAchievements();
+	*achievementHandle = achievementIniterface->GetAchievementHandle(platformHandle);
 	assert(achievementHandle != nullptr);
-	//looong line
-	EOS_Achievements_DefinitionV2* definition = achievementIniterface->GetAchievementDefinitions(achievementHandle, platformHandle, puid);
-	assert(definition != nullptr);
 
-	std::cout << "Achievement is: " << definition->LockedDisplayName << std::endl;
+	//Display all StubGame locked achievements
+	EOS_Achievements_DefinitionV2* definitionArray = achievementIniterface->GetAchievementDefinitions(achievementHandle, platformHandle, puid);
+	assert(definitionArray != nullptr);
+	EOS_Achievements_DefinitionV2* iterator = definitionArray;
+	std::cout << "/------StubGame Locked Achievements------\\" << std::endl;
+	for (int i = 0; i < achievementIniterface->achievementCount; i++)
+	{
+		iterator = &definitionArray[i];
+		std::cout << "Achievement: " << iterator->LockedDisplayName << std::endl;
+		iterator++;
+	}
 
+	//Unlock the first achievement manually, or not
+	EOS_Achievements_DefinitionV2* achievement = &definitionArray[0];
+	std::cout << "Would you like to unlock an achievement? (y/n)" << std::endl;
+	char input;
+	std::cin >> input;
+	if (input == 'y') {
+		achievementIniterface->ManualUnlockAchievement(achievementHandle, platformHandle, puid, achievement);
+	}
+	else {
+		std::cout << "okay..." << std::endl;
+	}
 
+	//Display player achievement progression
+	EOS_Achievements_PlayerAchievement* playerAchievementArray = achievementIniterface->GetPlayerAchievement(achievementHandle, platformHandle, puid);
+	assert(playerAchievementArray != nullptr);
+	EOS_Achievements_PlayerAchievement* playerAchievementIterator = playerAchievementArray;
+	std::cout << "/------Player Achievements------\\" << std::endl;
+	for (int i = 0; i < achievementIniterface->achievementCount; i++)
+	{
+		playerAchievementIterator = &playerAchievementArray[i];
+		std::cout << "Achievement: " << playerAchievementIterator->DisplayName << std::endl;
+		playerAchievementIterator++;
+	}
+
+	// Clean up
+	std::cout << "\\------Ending Program------/" << std::endl;
+	EOS_Platform_Release(*platformHandle);
+	delete platformHandle;
+	delete achievementHandle;
+	delete config;
+	delete puid;
 }
