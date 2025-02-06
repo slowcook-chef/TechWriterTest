@@ -132,6 +132,7 @@
     <ClCompile Include="AchievementInterface.cpp" />
     <ClCompile Include="AuthHandler.cpp" />
     <ClCompile Include="PlatformHandler.cpp" />
+    <ClCompile Include="StatsInterface.cpp" />
     <ClCompile Include="StubGame.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +140,7 @@
     <ClInclude Include="AuthHandler.h" />
     <ClInclude Include="PlatformHandler.h" />
     <ClInclude Include="SDKConfig.h" />
+    <ClInclude Include="StatsInterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

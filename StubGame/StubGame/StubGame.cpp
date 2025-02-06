@@ -15,7 +15,7 @@
 #include "PlatformHandler.h"
 #include "AuthHandler.h"
 #include "AchievementInterface.h"
-
+#include "StatsInterface.h"
 int main()
 {
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -36,46 +36,57 @@ int main()
 	std::cout << "Logged in and PUID is: " << puid << std::endl;
 
 	//Initialize the achievement interface and handle
-	AchievementInterface* achievementIniterface = new AchievementInterface();
+	AchievementInterface* achievementInterface = new AchievementInterface();
 	EOS_HAchievements* achievementHandle = new EOS_HAchievements();
-	*achievementHandle = achievementIniterface->GetAchievementHandle(platformHandle);
+	*achievementHandle = achievementInterface->GetAchievementHandle(platformHandle);
 	assert(achievementHandle != nullptr);
 
-	//Display all StubGame locked achievements
-	EOS_Achievements_DefinitionV2* definitionArray = achievementIniterface->GetAchievementDefinitions(achievementHandle, platformHandle, puid);
+	//Get and Display all achievements definitions
+	EOS_Achievements_DefinitionV2* definitionArray = achievementInterface->GetAchievementDefinitions(achievementHandle, platformHandle, puid);
 	assert(definitionArray != nullptr);
-	EOS_Achievements_DefinitionV2* iterator = definitionArray;
-	std::cout << "/------StubGame Locked Achievements------\\" << std::endl;
-	for (int i = 0; i < achievementIniterface->achievementCount; i++)
-	{
-		iterator = &definitionArray[i];
-		std::cout << "Achievement: " << iterator->LockedDisplayName << std::endl;
-		iterator++;
-	}
+	achievementInterface->DisplayAchievementDefinitions(definitionArray);
 
-	//Unlock the first achievement manually, or not
+	//Unlock the first achievement manually
 	EOS_Achievements_DefinitionV2* achievement = &definitionArray[0];
-	std::cout << "Would you like to unlock an achievement? (y/n)" << std::endl;
+	std::cout << "Would you like to unlock " << achievement->LockedDisplayName << "? (y / n)" << std::endl;
 	char input;
 	std::cin >> input;
 	if (input == 'y') {
-		achievementIniterface->ManualUnlockAchievement(achievementHandle, platformHandle, puid, achievement);
+		achievementInterface->ManualUnlockAchievement(achievementHandle, platformHandle, puid, achievement);
 	}
 	else {
 		std::cout << "okay..." << std::endl;
 	}
 
 	//Display player achievement progression
-	EOS_Achievements_PlayerAchievement* playerAchievementArray = achievementIniterface->GetPlayerAchievement(achievementHandle, platformHandle, puid);
-	assert(playerAchievementArray != nullptr);
-	EOS_Achievements_PlayerAchievement* playerAchievementIterator = playerAchievementArray;
-	std::cout << "/------Player Achievements------\\" << std::endl;
-	for (int i = 0; i < achievementIniterface->achievementCount; i++)
+	EOS_Achievements_PlayerAchievement* playerAchievements = achievementInterface->GetPlayerAchievements(achievementHandle, platformHandle, puid);
+	achievementInterface->DisplayPlayerAchievements(playerAchievements);
+
+	//Initialize stats interface and handle
+	StatsInterface* statsInterface = new StatsInterface();
+	EOS_HStats* statsHandle = new EOS_HStats();
+	*statsHandle = statsInterface->GetStatsHandle(platformHandle);
+	assert(statsHandle != nullptr);
+
+	//Ingest stats (pancakes)
+	bool breakout = false;
+	while (!breakout)
 	{
-		playerAchievementIterator = &playerAchievementArray[i];
-		std::cout << "Achievement: " << playerAchievementIterator->DisplayName << std::endl;
-		playerAchievementIterator++;
+		std::cout << "Would you like to ingest a pancake? (y / n)" << std::endl;
+		std::cin >> input;
+		if (input == 'y') {
+			statsInterface->IngestStat(statsHandle, platformHandle, puid, "Pancakes", 1);
+			std::cout << "Oooh yummy +1 pancakes" << std::endl;
+		}
+		else {
+			breakout = true;
+			std::cout << "No more pancakes for you!" << std::endl;
+		}
 	}
+
+	//Get stats
+	EOS_Stats_Stat* playerStats = statsInterface->GetStats(statsHandle, platformHandle, puid);
+	statsInterface->DisplayPlayerStats(playerStats);
 
 	// Clean up
 	std::cout << "\\------Ending Program------/" << std::endl;
@@ -85,3 +96,4 @@ int main()
 	delete config;
 	delete puid;
 }
+

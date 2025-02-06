@@ -27,6 +27,9 @@
     <ClCompile Include="AchievementInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StatsInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDKConfig.h">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="AchievementInterface.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatsInterface.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

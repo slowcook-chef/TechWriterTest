@@ -46,12 +46,9 @@ EOS_Achievements_DefinitionV2* AchievementInterface::GetAchievementDefinitions(E
 		assert(definition != nullptr);
 		definitionsArray[i] = *definition;
 	}
-
-	//Set static count, and return array
-	
 	return definitionsArray;
 }
-EOS_Achievements_PlayerAchievement* AchievementInterface::GetPlayerAchievement(EOS_HAchievements* achievementHandle, EOS_HPlatform* platformHandle, EOS_ProductUserId* puid) {
+EOS_Achievements_PlayerAchievement* AchievementInterface::GetPlayerAchievements(EOS_HAchievements* achievementHandle, EOS_HPlatform* platformHandle, EOS_ProductUserId* puid) {
 	assert(puid != nullptr);
 	//Query player achievements and cache them locally
 	EOS_Achievements_QueryPlayerAchievementsOptions playerAchievementOptions = {};
@@ -103,7 +100,25 @@ void AchievementInterface::ManualUnlockAchievement(EOS_HAchievements* achievemen
 	}
 	
 }
+//Display achievements functions
+void AchievementInterface::DisplayPlayerAchievements(EOS_Achievements_PlayerAchievement* playerAchievements) {
+	assert(playerAchievements != nullptr);
+	std::cout << "/------Player Achievements------\\" << std::endl;
+	for (int i = 0; i < achievementCount; i++)
+	{
+		std::cout << "Achievement: " << playerAchievements[i].DisplayName << std::endl;
+	}
+}
+void AchievementInterface::DisplayAchievementDefinitions(EOS_Achievements_DefinitionV2* definitions) {
+	assert(definitions != nullptr);
+	std::cout << "/------Achievement Definitions------\\" << std::endl;
+	for (int i = 0; i < achievementCount; i++)
+	{
+		std::cout << "Achievement: " << definitions[i].LockedDisplayName << std::endl;
+	}
+}
 
+//EOS_CALL callbacks
 void EOS_CALL AchievementInterface::EOS_Achievements_OnQueryDefinitionsCompleteCallback(const EOS_Achievements_OnQueryDefinitionsCompleteCallbackInfo* Data) {
 	assert(Data != NULL);
 
